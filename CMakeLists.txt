@@ -1,42 +1,44 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
+project(mv_cameras_ros)
 
-include(ReMake)
+find_package(catkin_simple REQUIRED)
+catkin_simple(ALL_DEPS_REQUIRED)
 
-remake_project(
-  mv-cameras-ros-${ROS_DISTRIBUTION}
-  VERSION 0.1
-  RELEASE alpha
-  SUMMARY "ROS driver for Matrix Vision cameras."
-  AUTHOR "Jerome Maye"
-  CONTACT "jerome.maye@mavt.ethz.ch"
-  HOME "http://github.com/jmaye/mv_cameras_ros"
-  LICENSE "GNU Lesser General Public License (LGPL)"
-  PREFIX mv-cameras-
-  INSTALL /usr
-  CONFIGURATION_DESTINATION /etc/mv-cameras
-  EXTRA_CXX_FLAGS -std=c++0x
+find_package(catkin REQUIRED)
+
+add_definitions(--std=c++11 -Wno-unknown-pragmas)
+
+include_directories(/opt/mvIMPACT_Acquire)
+
+##########################
+# EXECUTABLE AND LIBRARY #
+##########################
+cs_add_library(${PROJECT_NAME}
+  src/BinaryBufferReader.cpp
+  src/BinaryBufferWriter.cpp
+  src/BinaryReader.cpp
+  src/BinaryWriter.cpp
+  src/CameraManagerNode.cpp
+  src/CameraNode.cpp
+  src/Condition.cpp
+  src/InvalidOperationException.cpp
+  src/IOException.cpp
+  src/Mutex.cpp
+  src/mv_cameras_node.cpp
+  src/Serializable.cpp
+  src/Thread.cpp
+  src/Threads.cpp
+  src/Timer.cpp
+  src/Timestamp.cpp
+  src/TypeCastException.cpp
 )
 
-remake_var_name(GIT_REVISION_VAR ${REMAKE_PROJECT_NAME} GIT_REVISION)
+##########
+# GTESTS #
+##########
 
-remake_ros_pack_deb()
-
-if(${ROS_DISTRIBUTION} STREQUAL fuerte)
-  remake_ros_distribute_deb(
-    DISTRIBUTION lucid
-    SECTION libs
-    DEPENDS remake pkg-config
-    UPLOAD ppa:jmaye/ros
-    PASS CMAKE_BUILD_TYPE ${GIT_REVISION_VAR}
-    FORCE_CONSISTENCY
-  )
-endif()
-
-remake_ros_distribute_deb(
-  DISTRIBUTION precise
-  SECTION libs
-  DEPENDS remake pkg-config
-  UPLOAD ppa:jmaye/ros
-  PASS CMAKE_BUILD_TYPE ${GIT_REVISION_VAR}
-  FORCE_CONSISTENCY
-)
+##########
+# EXPORT #
+##########
+cs_install()
+cs_export()
